@@ -114,14 +114,6 @@
     .ai-box{background:var(--navy);border-radius:8px;padding:13px 14px;font-size:13px;line-height:1.75;color:var(--off-white);white-space:pre-wrap;border:1px solid var(--navy-lighter)}
     .ai-loading{color:var(--gray);font-style:italic}
 
-    /* API SETUP */
-    .api-setup{background:var(--navy-mid);border-radius:10px;padding:16px;border:1px dashed var(--navy-lighter);text-align:center}
-    .api-setup p{font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6}
-    .api-input{width:100%;background:var(--navy);border:1px solid var(--navy-lighter);border-radius:6px;padding:9px 11px;color:var(--off-white);font-size:12px;margin-bottom:8px;font-family:monospace}
-    .api-input:focus{outline:none;border-color:var(--red)}
-    .api-save{padding:9px 20px;background:var(--red);color:#fff;border:none;border-radius:6px;font-weight:800;cursor:pointer;font-size:13px}
-    .api-note{font-size:10px;color:var(--gray);margin-top:8px;line-height:1.5}
-
     /* TIMEOUT BADGE */
     .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
     .badge-timeout{background:rgba(192,80,0,.2);color:var(--orange)}
@@ -202,13 +194,6 @@
     <button class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
   </div>
 
-  <div class="api-setup hidden" id="apiSetup">
-    <p>Deep Feedback uses Claude to evaluate your reasoning like a real interviewer. Enter your Anthropic API key — stored only on this device.</p>
-    <input class="api-input" type="password" id="apiKeyInput" placeholder="sk-ant-...">
-    <br>
-    <button class="api-save" onclick="saveApiKey()">Save &amp; Evaluate</button>
-    <p class="api-note">Your key never leaves this device except to call the app's Netlify backend over HTTPS. Clear browser storage to remove it.</p>
-  </div>
 
   <div class="feedback" id="feedbackPanel">
     <div class="fb-header">Answer Breakdown</div>
@@ -586,7 +571,6 @@ function loadQ() {
   document.getElementById('submitBtn').disabled=false;
   document.getElementById('feedbackPanel').classList.remove('show');
   document.getElementById('nextBtn').classList.add('hidden');
-  document.getElementById('apiSetup').classList.add('hidden');
   document.getElementById('timeoutBadge').classList.add('hidden');
 
   S.maxTime=S.q.seconds||90;
@@ -671,14 +655,6 @@ function grade(pts){
 async function showDeepFeedback(timedOut){
   document.getElementById('rubricWrap').classList.add('hidden');
   document.getElementById('aiWrap').classList.remove('hidden');
-  document.getElementById('apiSetup').classList.add('hidden');
-
-  const apiKey=localStorage.getItem('c1_api_key');
-  if(!apiKey){
-    document.getElementById('apiSetup').classList.remove('hidden');
-    document.getElementById('aiWrap').classList.add('hidden');
-    return;
-  }
 
   const aiBox=document.getElementById('aiBox');
   aiBox.className='ai-box ai-loading';
@@ -713,17 +689,6 @@ async function showDeepFeedback(timedOut){
     aiBox.textContent=`Could not get evaluation: ${e.message}\n\nCheck that ANTHROPIC_API_KEY is set in your Netlify environment variables.`;
   }
   document.getElementById('nextBtn').classList.remove('hidden');
-}
-
-// ─────────────────────────────────────────────
-// API KEY
-// ─────────────────────────────────────────────
-function saveApiKey(){
-  const key=document.getElementById('apiKeyInput').value.trim();
-  if(!key.startsWith('sk-ant-')){alert("That doesn't look like an Anthropic API key (should start with sk-ant-)");return;}
-  localStorage.setItem('c1_api_key',key);
-  document.getElementById('apiSetup').classList.add('hidden');
-  showDeepFeedback(false);
 }
 
 // ─────────────────────────────────────────────
