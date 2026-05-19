@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>C1 Case Prep</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --red:#CC0000;
+      --red-dark:#A00000;
+      --navy:#0D1B2A;
+      --navy-mid:#162537;
+      --navy-light:#1E3350;
+      --navy-lighter:#243B55;
+      --off-white:#EEF2F7;
+      --gray:#7A8FA6;
+      --green:#2E9E5B;
+      --yellow:#D4A017;
+      --orange:#C05000;
+    }
+    html,body{height:100%;background:var(--navy);color:var(--off-white);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+    body{display:flex;flex-direction:column;max-width:520px;margin:0 auto}
+
+    /* HEADER */
+    header{background:var(--navy-mid);border-bottom:3px solid var(--red);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+    .logo{font-size:13px;font-weight:800;color:var(--red);letter-spacing:2px;text-transform:uppercase}
+    .stats{display:flex;gap:18px}
+    .stat{text-align:center}
+    .stat-val{font-size:19px;font-weight:700;color:var(--off-white);line-height:1}
+    .stat-label{font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+
+    /* MODE BAR */
+    .mode-bar{background:var(--navy-mid);display:flex;padding:10px 12px;gap:8px;border-bottom:1px solid var(--navy-lighter)}
+    .mode-btn{flex:1;padding:9px 4px;border:1px solid var(--navy-lighter);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;background:transparent;color:var(--gray);letter-spacing:.3px}
+    .mode-btn.active{background:var(--red);color:#fff;border-color:var(--red)}
+
+    /* CATEGORIES */
+    .categories{padding:10px 12px;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--navy-lighter)}
+    .categories::-webkit-scrollbar{display:none}
+    .cat-pill{padding:5px 13px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;border:1px solid var(--navy-lighter);background:transparent;color:var(--gray);transition:all .15s;letter-spacing:.2px}
+    .cat-pill.active{background:var(--red);color:#fff;border-color:var(--red)}
+
+    /* MAIN */
+    main{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+
+    /* TIMER */
+    .timer-wrap{display:flex;align-items:center;gap:10px}
+    .timer-bar{flex:1;height:5px;background:var(--navy-lighter);border-radius:3px;overflow:hidden}
+    .timer-fill{height:100%;background:var(--red);transition:width 1s linear;border-radius:3px}
+    .timer-text{font-size:12px;font-weight:700;color:var(--gray);min-width:30px;text-align:right}
+
+    /* CARD */
+    .card{background:var(--navy-mid);border-radius:10px;padding:16px;border:1px solid var(--navy-lighter)}
+    .q-type{font-size:10px;color:var(--red);font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+    .q-text{font-size:14px;line-height:1.65;color:var(--off-white);white-space:pre-line}
+
+    /* STEPS (market sizing) */
+    .steps{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .step-row{display:flex;gap:8px;align-items:flex-start}
+    .step-num{background:var(--red);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:14px}
+    .step-inner{flex:1}
+    .step-label{font-size:10px;color:var(--gray);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .step-ta{width:100%;background:var(--navy);border:1px solid var(--navy-lighter);border-radius:6px;padding:7px 9px;color:var(--off-white);font-size:13px;resize:none;font-family:inherit;line-height:1.5}
+    .step-ta:focus{outline:none;border-color:var(--red)}
+
+    /* ANSWER */
+    .ans-label{font-size:10px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+    textarea{width:100%;background:var(--navy);border:1px solid var(--navy-lighter);border-radius:8px;padding:11px 12px;color:var(--off-white);font-size:14px;line-height:1.6;resize:vertical;min-height:90px;font-family:inherit}
+    textarea:focus{outline:none;border-color:var(--red)}
+    textarea::placeholder{color:var(--gray);font-size:13px}
+
+    /* BUTTONS */
+    .btn-primary{width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;margin-top:10px;letter-spacing:.3px;transition:opacity .15s}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+    .btn-primary:not(:disabled):active{opacity:.75}
+    .btn-secondary{width:100%;padding:12px;background:transparent;color:var(--off-white);border:1px solid var(--navy-lighter);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .15s}
+    .btn-secondary:hover{background:var(--navy-lighter)}
+
+    /* FEEDBACK */
+    .feedback{display:none}
+    .feedback.show{display:flex;flex-direction:column;gap:10px}
+    .fb-header{font-size:10px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:1.5px}
+
+    .formula-box{background:var(--navy);border-radius:8px;padding:12px 14px;border-left:3px solid var(--red)}
+    .f-label{font-size:10px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .f-formula{font-size:13px;color:var(--off-white);font-weight:600;line-height:1.5}
+    .f-calc{font-size:12px;color:var(--green);margin-top:5px;line-height:1.5}
+
+    .range-box{background:var(--navy);border-radius:8px;padding:10px 14px;border-left:3px solid var(--green)}
+    .range-label{font-size:10px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+    .range-val{font-size:15px;color:var(--green);font-weight:700}
+
+    /* RUBRIC */
+    .rubric-title{font-size:10px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+    .rubric-list{display:flex;flex-direction:column;gap:1px}
+    .rubric-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--navy-lighter);font-size:13px;line-height:1.4;cursor:pointer;user-select:none}
+    .rubric-row:last-child{border-bottom:none}
+    .rcheck{width:20px;height:20px;border-radius:50%;border:2px solid var(--navy-lighter);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s}
+    .rcheck.on{background:var(--green);border-color:var(--green);color:#fff}
+
+    .grade-row{display:flex;gap:8px;margin-top:4px}
+    .g-btn{flex:1;padding:11px 4px;border:none;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.3px;transition:opacity .15s}
+    .g-btn:active{opacity:.75}
+    .g-btn:disabled{opacity:.4;cursor:not-allowed}
+    .g-nail{background:var(--green);color:#fff}
+    .g-got{background:var(--yellow);color:#111}
+    .g-miss{background:var(--gray);color:#fff}
+
+    /* DEEP FEEDBACK */
+    .ai-box{background:var(--navy);border-radius:8px;padding:13px 14px;font-size:13px;line-height:1.75;color:var(--off-white);white-space:pre-wrap;border:1px solid var(--navy-lighter)}
+    .ai-loading{color:var(--gray);font-style:italic}
+
+    /* API SETUP */
+    .api-setup{background:var(--navy-mid);border-radius:10px;padding:16px;border:1px dashed var(--navy-lighter);text-align:center}
+    .api-setup p{font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6}
+    .api-input{width:100%;background:var(--navy);border:1px solid var(--navy-lighter);border-radius:6px;padding:9px 11px;color:var(--off-white);font-size:12px;margin-bottom:8px;font-family:monospace}
+    .api-input:focus{outline:none;border-color:var(--red)}
+    .api-save{padding:9px 20px;background:var(--red);color:#fff;border:none;border-radius:6px;font-weight:800;cursor:pointer;font-size:13px}
+    .api-note{font-size:10px;color:var(--gray);margin-top:8px;line-height:1.5}
+
+    /* STATUS BADGE */
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .badge-timeout{background:rgba(192,80,0,.2);color:var(--orange)}
+
+    .hidden{display:none!important}
+    .streak-icon{font-size:14px}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">C1 Case Prep</div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val" id="statScore">0</div>
+      <div class="stat-label">Score</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statStreak">0 <span class="streak-icon">&#128293;</span></div>
+      <div class="stat-label">Streak</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statTotal">0</div>
+      <div class="stat-label">Done</div>
+    </div>
+  </div>
+</header>
+
+<div class="mode-bar">
+  <button class="mode-btn active" id="btnQuick" onclick="setMode('quick')">&#9889; Quick Drill</button>
+  <button class="mode-btn" id="btnDeep" onclick="setMode('deep')">&#129504; Deep Feedback</button>
+</div>
+
+<div class="categories">
+  <button class="cat-pill active" data-cat="all" onclick="setCat(this)">All</button>
+  <button class="cat-pill" data-cat="breakeven" onclick="setCat(this)">Breakeven</button>
+  <button class="cat-pill" data-cat="ev" onclick="setCat(this)">Expected Value</button>
+  <button class="cat-pill" data-cat="market" onclick="setCat(this)">Market Sizing</button>
+  <button class="cat-pill" data-cat="weighted" onclick="setCat(this)">Weighted Avg</button>
+  <button class="cat-pill" data-cat="costs" onclick="setCat(this)">Fixed/Variable</button>
+</div>
+
+<main>
+  <div class="timer-wrap">
+    <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+    <div class="timer-text" id="timerText">90s</div>
+  </div>
+
+  <div class="card" id="questionCard">
+    <div class="q-type" id="qType"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="steps hidden" id="stepList"></div>
+  </div>
+
+  <div class="card" id="answerCard">
+    <div class="ans-label">Your Reasoning &amp; Answer</div>
+    <textarea id="answerInput" placeholder="State the formula first, then walk through your numbers. Explain any assumptions you're making."></textarea>
+    <button class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+  </div>
+
+  <div class="api-setup hidden" id="apiSetup">
+    <p>Deep Feedback uses Claude to evaluate your reasoning like a real interviewer. Enter your Anthropic API key — stored only on this device.</p>
+    <input class="api-input" type="password" id="apiKeyInput" placeholder="sk-ant-...">
+    <br>
+    <button class="api-save" onclick="saveApiKey()">Save &amp; Evaluate</button>
+    <p class="api-note">Your key never leaves your device except to call api.anthropic.com directly via this app's backend. To remove it, clear your browser storage.</p>
+  </div>
+
+  <div class="feedback" id="feedbackPanel">
+    <div class="fb-header">Answer Breakdown</div>
+    <div id="timeoutBadge" class="hidden"><span class="badge badge-timeout">Timed Out</span></div>
+
+    <div class="formula-box">
+      <div class="f-label">Formula</div>
+      <div class="f-formula" id="fbFormula"></div>
+      <div class="f-calc" id="fbCalc"></div>
+    </div>
+
+    <div class="range-box hidden" id="rangeBox">
+      <div class="range-label">Reasonable Range</div>
+      <div class="range-val" id="rangeVal"></div>
+    </div>
+
+    <!-- Quick mode rubric -->
+    <div id="rubricWrap">
+      <div class="rubric-title">Did your answer cover:</div>
+      <div class="rubric-list" id="rubricList"></div>
+      <div class="grade-row" id="gradeRow">
+        <button class="g-btn g-nail" onclick="grade(3)">Nailed it</button>
+        <button class="g-btn g-got" onclick="grade(2)">Got it</button>
+        <button class="g-btn g-miss" onclick="grade(1)">Missed it</button>
+      </div>
+    </div>
+
+    <!-- Deep mode AI -->
+    <div class="hidden" id="aiWrap">
+      <div class="rubric-title">Claude's Evaluation</div>
+      <div class="ai-box" id="aiBox"></div>
+    </div>
+
+    <button class="btn-secondary hidden" id="nextBtn" onclick="nextQuestion()">Next Question &#8594;</button>
+  </div>
+</main>
+
+<script>
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const fmtN = (n) => {
+  if (n >= 1e9) return (n / 1e9).toFixed(n % 1e9 === 0 ? 0 : 1) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1) + 'M';
+  if (n >= 1e3) return n.toLocaleString();
+  return String(n);
+};
+
+// ─────────────────────────────────────────────
+// QUESTION BANK
+// ─────────────────────────────────────────────
+const BANK = {
+  breakeven: [
+    () => {
+      const fixed = pick([400000,600000,800000,1000000,1500000,2000000]);
+      const price = pick([50,75,100,125,150,200]);
+      const varPct = pick([0.30,0.35,0.40,0.45,0.50]);
+      const varCost = Math.round(price * varPct / 5) * 5;
+      const margin = price - varCost;
+      const answer = Math.ceil(fixed / margin);
+      return {
+        type:'Breakeven Analysis',
+        seconds:90,
+        text:`Capital One is launching a new co-branded travel credit card. Annual fixed costs — technology build, dedicated compliance staff, and marketing — total $${fmtN(fixed)}. Each active cardholder generates $${price}/year in interchange and annual fee revenue, with $${varCost}/year in rewards fulfillment and servicing costs.\n\nHow many cardholders are needed to break even annually? Walk through your formula and assumptions.`,
+        formula:`Breakeven = Fixed Costs ÷ (Revenue per unit − Variable Cost per unit)`,
+        calc:`$${fmtN(fixed)} ÷ ($${price} − $${varCost}) = $${fmtN(fixed)} ÷ $${margin} = ${fmtN(answer)} cardholders`,
+        rubric:[
+          'Stated the breakeven formula before plugging in numbers',
+          'Correctly identified contribution margin (price minus variable cost)',
+          'Applied Fixed Costs ÷ Contribution Margin',
+          'Noted assumptions (e.g., all cardholders active full year)',
+          'Sanity-checked the magnitude of the answer',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const fixed = pick([300000,500000,750000,1000000,1200000]);
+      const pricePerMo = pick([25,30,40,50,60]);
+      const varPerMo = Math.round(pricePerMo * pick([0.25,0.30,0.35]) / 5) * 5;
+      const marginMo = pricePerMo - varPerMo;
+      const marginAnn = marginMo * 12;
+      const answer = Math.ceil(fixed / marginAnn);
+      return {
+        type:'Breakeven Analysis',
+        seconds:90,
+        text:`You're building the business case for a new Capital One digital personal finance subscription. Annual fixed costs (engineering, content, licensing) are $${fmtN(fixed)}. Each subscriber pays $${pricePerMo}/month and costs $${varPerMo}/month to serve (payment processing, support).\n\nAt what subscriber count does the product break even annually? Be explicit about how you handle the monthly-to-annual conversion.`,
+        formula:`Breakeven = Fixed Annual Costs ÷ Annual Contribution Margin per subscriber`,
+        calc:`Contribution margin: $${pricePerMo} − $${varPerMo} = $${marginMo}/mo → $${marginAnn}/yr | $${fmtN(fixed)} ÷ $${marginAnn} = ${fmtN(answer)} subscribers`,
+        rubric:[
+          'Converted monthly margin to annual before dividing',
+          'Identified contribution margin correctly',
+          'Set up Breakeven = Fixed ÷ Annual Contribution Margin',
+          'Flagged the time-unit reconciliation as a key assumption',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const fixed = pick([2000000,3000000,4000000,5000000]);
+      const pricePerLoan = pick([400,500,600,800]);
+      const varPerLoan = Math.round(pricePerLoan * pick([0.30,0.35,0.40]) / 10) * 10;
+      const margin = pricePerLoan - varPerLoan;
+      const answer = Math.ceil(fixed / margin);
+      return {
+        type:'Breakeven Analysis',
+        seconds:90,
+        text:`Capital One is evaluating a new auto lending pilot. Annual fixed costs (risk team, underwriting platform, regulatory) are $${fmtN(fixed)}. Net revenue per originated loan is $${pricePerLoan}, and variable cost per loan (origination processing, credit pulls) is $${varPerLoan}.\n\nHow many loans must be originated annually to cover fixed costs? What does this imply about the minimum viable scale of the pilot?`,
+        formula:`Breakeven Loans = Fixed Costs ÷ Net Margin per Loan`,
+        calc:`$${fmtN(fixed)} ÷ ($${pricePerLoan} − $${varPerLoan}) = $${fmtN(fixed)} ÷ $${margin} = ${fmtN(answer)} loans/year`,
+        rubric:[
+          'Applied breakeven = fixed ÷ per-unit margin',
+          'Calculated margin per loan correctly',
+          'Connected the answer to a strategic insight (minimum pilot scale)',
+          'Discussed implications if projected volume falls short',
+        ],
+        isMarket:false,
+      };
+    },
+  ],
+
+  ev: [
+    () => {
+      const pS = pick([20,25,30,35]);
+      const pF = 100 - pS;
+      const vS = pick([3,5,8,10]) * 1e6;
+      const vF = pick([300,400,500,600]) * 1e3;
+      const ev = (pS/100)*vS + (pF/100)*vF;
+      return {
+        type:'Expected Value',
+        seconds:90,
+        text:`Your PM team is deciding whether to build a new AI-powered credit limit increase feature. Based on historical data, there's a ${pS}% chance the feature performs strongly and generates $${fmtN(vS)}/year in incremental revenue. There's a ${pF}% chance it underperforms (regulatory friction, low uptake) and generates only $${fmtN(vF)}/year.\n\nCalculate the expected value. How would you use this number in your go/no-go recommendation?`,
+        formula:`EV = P(success) × V(success) + P(underperform) × V(underperform)`,
+        calc:`(${pS}% × $${fmtN(vS)}) + (${pF}% × $${fmtN(vF)}) = $${fmtN(Math.round((pS/100)*vS))} + $${fmtN(Math.round((pF/100)*vF))} = $${fmtN(Math.round(ev))}`,
+        rubric:[
+          'Multiplied each probability by its corresponding value',
+          'Summed both terms to get total EV',
+          'Compared EV to the estimated build cost for the decision',
+          'Named at least one qualitative factor beyond the EV number',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const p1 = pick([15,20,25,30]);
+      const p2 = pick([30,35,40]);
+      const p3 = 100 - p1 - p2;
+      const v1 = pick([8,10,12,15]) * 1e6;
+      const v2 = pick([2,3,4]) * 1e6;
+      const v3 = pick([200,300,400]) * 1e3;
+      const ev = (p1/100)*v1 + (p2/100)*v2 + (p3/100)*v3;
+      return {
+        type:'Expected Value',
+        seconds:90,
+        text:`You're evaluating a credit line expansion campaign with three modeled scenarios:\n• Strong (${p1}% probability): $${fmtN(v1)} incremental revenue\n• Moderate (${p2}% probability): $${fmtN(v2)}\n• Weak (${p3}% probability): $${fmtN(v3)}\n\nCalculate the expected value. The campaign costs $${fmtN(Math.round(ev * 0.6))} to execute. What is the expected net return, and what would you recommend?`,
+        formula:`EV = Σ P(scenarioᵢ) × V(scenarioᵢ); Net EV = EV − Cost`,
+        calc:`(${p1}%×$${fmtN(v1)}) + (${p2}%×$${fmtN(v2)}) + (${p3}%×$${fmtN(v3)}) = $${fmtN(Math.round(ev))} | Net: $${fmtN(Math.round(ev))} − $${fmtN(Math.round(ev*0.6))} = $${fmtN(Math.round(ev*0.4))}`,
+        rubric:[
+          'Verified the three probabilities sum to 100%',
+          'Weighted all three scenarios and summed them',
+          'Subtracted the campaign cost to get net EV',
+          'Made a concrete go/no-go recommendation with supporting logic',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const pA = pick([40,45,50,55]);
+      const pB = 100 - pA;
+      const vA = pick([1.5,2,2.5,3]) * 1e6;
+      const vB = pick([4,5,6,8]) * 1e6;
+      const evA = vA;
+      const evB = (pA/100)*vB + (pB/100)*(-pick([500,750,1000])*1e3);
+      return {
+        type:'Expected Value',
+        seconds:90,
+        text:`Capital One is choosing between two fraud-prevention initiatives:\n\nOption A (rule-based): Guaranteed $${fmtN(vA)}/year in prevented fraud losses. Cost: $${fmtN(Math.round(vA*0.3))}.\n\nOption B (ML model): ${pA}% chance of preventing $${fmtN(vB)}/year, ${pB}% chance model underperforms and causes $${fmtN(Math.round(Math.abs((pB/100)*(-pick([500000,750000,1000000])))))} in false-positive customer attrition. Cost: $${fmtN(Math.round(vA*0.5))}.\n\nCalculate the expected net value of each. Which would you recommend and why?`,
+        formula:`EV(A) = Guaranteed value − Cost | EV(B) = [P(success)×Gain + P(fail)×Loss] − Cost`,
+        calc:`Net EV(A) = $${fmtN(vA)} − $${fmtN(Math.round(vA*0.3))} = $${fmtN(Math.round(vA*0.7))} | For B: calculate weighted outcomes then subtract cost`,
+        rubric:[
+          'Calculated EV for both options, including downside scenario for B',
+          'Subtracted respective costs to arrive at net EV',
+          'Made a clear recommendation — not just whichever has higher EV',
+          'Raised risk tolerance / optionality as a factor in the decision',
+        ],
+        isMarket:false,
+      };
+    },
+  ],
+
+  market: [
+    () => ({
+      type:'Market Sizing',
+      seconds:120,
+      text:`Capital One is assessing the annual interchange revenue opportunity for a new premium travel credit card in the US. The card targets adults with good-to-excellent credit who travel at least twice per year.\n\nEstimate the total addressable market. Walk through each assumption step by step — I want to follow your logic.`,
+      formula:`TAM = US Adults × Credit-eligible % × Travel-card affinity % × Avg annual spend × Interchange rate (~2%)`,
+      calc:`~260M adults × 65% credit-eligible × 20% travel-card affinity → ~34M addressable | $4,000 avg annual spend × 2% = $80/yr | 34M × $80 = ~$2.7B/yr TAM`,
+      rubric:[
+        'Started from US population and segmented down logically',
+        'Stated each assumption before using it',
+        'Applied interchange rate to card spend (not total spend)',
+        'Sanity-checked final number (e.g., comparable to known market data)',
+        'Acknowledged key sources of uncertainty',
+      ],
+      isMarket:true,
+      steps:[
+        {label:'US adult population (18+)',hint:'e.g., ~260M'},
+        {label:'% with good-to-excellent credit',hint:'e.g., ~65% → ~170M eligible'},
+        {label:'% likely to want a travel card',hint:'e.g., ~20% of eligible → ~34M'},
+        {label:'Avg annual card spend per cardholder',hint:'e.g., $3,000–$5,000/yr'},
+        {label:'Revenue estimate (spend × ~2% interchange)',hint:'e.g., $4K × 2% × 34M = $2.7B'},
+      ],
+      range:'$1.5B – $4.0B annual interchange revenue',
+    }),
+    () => ({
+      type:'Market Sizing',
+      seconds:120,
+      text:`Capital One is exploring launching a premium small-business checking account with a monthly fee. Estimate the total annual fee revenue opportunity in the United States.\n\nThink through how many small businesses exist, what fraction would pay for a premium account, and what a reasonable monthly fee looks like.`,
+      formula:`Revenue = US Small Businesses × Premium adoption % × Annual fee per account`,
+      calc:`~33M small businesses × ~10% willing to pay premium → ~3.3M accounts × $240/yr (~$20/mo) = ~$790M/yr`,
+      rubric:[
+        'Grounded estimate in a defensible US small business count (~30–35M)',
+        'Reasoned about willingness to pay vs. free alternatives',
+        'Applied a realistic monthly fee ($15–$30/mo range)',
+        'Compared result to a known reference point for sanity (e.g., Square, Chase Biz)',
+        'Distinguished TAM from realistic addressable segment for Capital One',
+      ],
+      isMarket:true,
+      steps:[
+        {label:'Number of US small businesses',hint:'e.g., ~33M (IRS/SBA data)'},
+        {label:'% that would pay for a premium biz account',hint:'e.g., 10–15%'},
+        {label:'Target addressable accounts',hint:'e.g., ~3–5M accounts'},
+        {label:'Monthly fee assumption',hint:'e.g., $15–$25/month'},
+        {label:'Annual revenue estimate',hint:'e.g., 3.3M × $240 = ~$790M'},
+      ],
+      range:'$500M – $1.5B annual fee revenue',
+    }),
+    () => ({
+      type:'Market Sizing',
+      seconds:120,
+      text:`Capital One's product team is sizing the US buy-now-pay-later (BNPL) market opportunity to decide whether to build a competing product. Estimate the total annual transaction volume for BNPL in the US today, and what a 5% market share would mean in revenue terms (assume ~3% revenue take rate on GMV).\n\nWalk through your assumptions.`,
+      formula:`GMV = US online shoppers × BNPL adoption % × Avg BNPL spend/yr | Revenue = GMV × Take rate`,
+      calc:`~170M online shoppers × ~20% BNPL adoption → ~34M users × $1,200/yr avg BNPL spend = ~$41B GMV | 5% share = ~$2B GMV × 3% = ~$61M revenue`,
+      rubric:[
+        'Estimated US online shopper base or total e-commerce spend as anchor',
+        'Reasoned about BNPL penetration rate with a justification',
+        'Calculated GMV, then applied take rate for revenue',
+        'Applied market share % correctly to get to Capital One-specific opportunity',
+        'Referenced a known data point to sanity check (e.g., Affirm/Klarna revenue)',
+      ],
+      isMarket:true,
+      steps:[
+        {label:'US online shoppers (or total e-comm GMV)',hint:'e.g., ~170M shoppers or ~$1T e-comm'},
+        {label:'BNPL adoption rate',hint:'e.g., ~15–25% of online shoppers use BNPL'},
+        {label:'Avg annual BNPL spend per user',hint:'e.g., $800–$1,500/yr'},
+        {label:'Total US BNPL GMV estimate',hint:'e.g., ~$30–50B/yr'},
+        {label:'Capital One 5% share × 3% take rate',hint:'e.g., $40B × 5% × 3% = $60M revenue'},
+      ],
+      range:'$40B–$100B total BNPL GMV | ~$50–$90M at 5% share, 3% take rate',
+    }),
+  ],
+
+  weighted: [
+    () => {
+      const s = [
+        {name:'Platinum',pct:pick([15,20,25]),rev:pick([800,900,1000,1100])},
+        {name:'Standard',pct:0,rev:pick([300,350,400,450])},
+        {name:'Basic',pct:pick([20,25,30]),rev:pick([70,90,110,130])},
+      ];
+      s[1].pct = 100 - s[0].pct - s[2].pct;
+      const wa = s.reduce((sum,x)=>sum+(x.pct/100)*x.rev,0);
+      return {
+        type:'Weighted Average',
+        seconds:90,
+        text:`Capital One's US card portfolio breaks down into three segments:\n• ${s[0].name}: ${s[0].pct}% of cardholders, avg $${s[0].rev}/year revenue each\n• ${s[1].name}: ${s[1].pct}%, avg $${s[1].rev}/year\n• ${s[2].name}: ${s[2].pct}%, avg $${s[2].rev}/year\n\nCalculate the portfolio-weighted average revenue per cardholder. Then explain what this number tells you about where to prioritize product investment.`,
+        formula:`Weighted Avg = Σ (segment weight × segment value)`,
+        calc:`(${s[0].pct}%×$${s[0].rev}) + (${s[1].pct}%×$${s[1].rev}) + (${s[2].pct}%×$${s[2].rev}) = $${wa.toFixed(0)}/cardholder`,
+        rubric:[
+          'Confirmed the three segment weights sum to 100%',
+          'Multiplied each segment\'s weight by its per-unit value',
+          'Summed all weighted values for the portfolio average',
+          'Connected the result to a concrete product investment recommendation',
+          'Noted that ${s[0].name} segment drives outsized value per cardholder',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const ch = [
+        {name:'Mobile App',pct:pick([40,45,50,55]),nps:pick([62,68,72,75])},
+        {name:'Web Portal',pct:0,nps:pick([40,45,50,55])},
+        {name:'Phone Support',pct:pick([15,18,22,25]),nps:pick([18,22,28,32])},
+      ];
+      ch[1].pct = 100 - ch[0].pct - ch[2].pct;
+      const wa = ch.reduce((sum,x)=>sum+(x.pct/100)*x.nps,0);
+      return {
+        type:'Weighted Average',
+        seconds:90,
+        text:`Customer experience data for Capital One's US card servicing shows:\n• ${ch[0].name}: ${ch[0].pct}% of interactions, NPS = ${ch[0].nps}\n• ${ch[1].name}: ${ch[1].pct}% of interactions, NPS = ${ch[1].nps}\n• ${ch[2].name}: ${ch[2].pct}% of interactions, NPS = ${ch[2].nps}\n\nCalculate the portfolio-weighted NPS. Which channel has the most leverage on the overall score, and what would you do about it?`,
+        formula:`Weighted NPS = Σ (channel share % × channel NPS)`,
+        calc:`(${ch[0].pct}%×${ch[0].nps}) + (${ch[1].pct}%×${ch[1].nps}) + (${ch[2].pct}%×${ch[2].nps}) = ${wa.toFixed(1)}`,
+        rubric:[
+          'Verified channel shares sum to 100%',
+          'Weighted each channel\'s NPS by its share of interactions',
+          'Summed to get portfolio-weighted NPS',
+          'Identified which channel has most influence (highest share × lowest NPS)',
+          'Made a specific investment recommendation based on the math',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const prod = [
+        {name:'Credit Cards',pct:pick([50,55,60]),margin:pick([28,30,32,35])},
+        {name:'Auto Loans',pct:0,margin:pick([18,20,22,24])},
+        {name:'Personal Loans',pct:pick([10,12,15,18]),margin:pick([38,40,42,45])},
+      ];
+      prod[1].pct = 100 - prod[0].pct - prod[2].pct;
+      const wa = prod.reduce((sum,x)=>sum+(x.pct/100)*x.margin,0);
+      return {
+        type:'Weighted Average',
+        seconds:90,
+        text:`Capital One's consumer lending portfolio has three product lines:\n• ${prod[0].name}: ${prod[0].pct}% of revenue, ${prod[0].margin}% net margin\n• ${prod[1].name}: ${prod[1].pct}% of revenue, ${prod[1].margin}% net margin\n• ${prod[2].name}: ${prod[2].pct}% of revenue, ${prod[2].margin}% net margin\n\nWhat is the blended portfolio margin? If you were VP of Product, what product-mix shift would you pursue and why?`,
+        formula:`Blended Margin = Σ (product revenue share % × product margin %)`,
+        calc:`(${prod[0].pct}%×${prod[0].margin}%) + (${prod[1].pct}%×${prod[1].margin}%) + (${prod[2].pct}%×${prod[2].margin}%) = ${wa.toFixed(1)}%`,
+        rubric:[
+          'Correctly weighted each product margin by its revenue share',
+          'Summed to get the blended portfolio margin',
+          'Identified which product is margin-accretive vs. dilutive',
+          'Proposed a specific product-mix shift with quantified rationale',
+          'Acknowledged tradeoffs (e.g., scale vs. margin, risk profile)',
+        ],
+        isMarket:false,
+      };
+    },
+  ],
+
+  costs: [
+    () => {
+      const fixedMo = pick([40000,60000,80000,100000,120000]);
+      const varPerUser = pick([3,4,5,6,8]);
+      const mau = pick([50000,80000,100000,150000,200000]);
+      const totalMo = fixedMo + varPerUser * mau;
+      const costIfDouble = fixedMo + varPerUser * mau * 2;
+      return {
+        type:'Fixed vs. Variable Costs',
+        seconds:90,
+        text:`You're building a monthly P&L for a new Capital One budgeting feature. Classify each cost below as fixed or variable, then calculate total monthly cost at ${fmtN(mau)} MAU. Explain what happens if MAU doubles.\n\n• Engineering team salaries: $${fmtN(Math.round(fixedMo*0.55))}/month\n• Cloud compute/storage (scales with users): $${varPerUser}/user/month\n• SaaS data provider license (flat fee): $${fmtN(Math.round(fixedMo*0.20))}/month\n• Customer support tickets (scales ~1:1 with MAU): $${Math.round(varPerUser*0.5)}/user/month\n• Office/overhead allocated to team: $${fmtN(Math.round(fixedMo*0.25))}/month`,
+        formula:`Total Cost = Fixed Costs + (Variable Rate per Unit × Units)`,
+        calc:`Fixed: $${fmtN(fixedMo)}/mo | Variable: $${varPerUser + Math.round(varPerUser*0.5)}/MAU | At ${fmtN(mau)} MAU: $${fmtN(totalMo)}/mo | At ${fmtN(mau*2)} MAU: $${fmtN(costIfDouble)}/mo`,
+        rubric:[
+          'Correctly classified salaries, license, overhead as fixed',
+          'Correctly classified cloud compute and support as variable',
+          'Summed fixed costs and calculated variable total separately, then added',
+          'Articulated that fixed costs stay flat when MAU doubles; variable costs double',
+          'Calculated or estimated the cost at double MAU',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const fixedA = pick([1000000,1500000,2000000,2500000]);
+      const varA = pick([15,20,25,30]);
+      const varB = Math.round(varA * pick([2.0,2.2,2.5]) / 5) * 5;
+      const crossover = Math.ceil(fixedA / (varB - varA));
+      const volume = pick([20000,35000,50000,75000,100000]);
+      const costA = fixedA + varA * volume;
+      const costB = varB * volume;
+      return {
+        type:'Fixed vs. Variable Costs',
+        seconds:90,
+        text:`Capital One is choosing between two operating models for a new auto loan servicing capability:\n\nOption A (Build in-house): $${fmtN(fixedA)} annual fixed costs + $${varA}/loan variable cost\nOption B (Outsource): $0 fixed + $${varB}/loan variable cost\n\nAt what loan volume do both options cost the same? Which is better at a projected volume of ${fmtN(volume)} loans/year, and how confident should you be in that recommendation?`,
+        formula:`Crossover: Fixed_A = (Var_B − Var_A) × V → V = Fixed_A ÷ (Var_B − Var_A)`,
+        calc:`$${fmtN(fixedA)} ÷ ($${varB} − $${varA}) = $${fmtN(fixedA)} ÷ $${varB-varA} = ${fmtN(crossover)} loans | At ${fmtN(volume)}: A=$${fmtN(costA)}, B=$${fmtN(costB)}`,
+        rubric:[
+          'Set up the cost-equivalence equation (Cost_A = Cost_B)',
+          'Solved algebraically for the crossover volume',
+          'Compared total costs at the projected volume to identify the winner',
+          'Discussed sensitivity: what if volume comes in 20% lower?',
+          'Flagged non-cost factors (control, quality, ramp time)',
+        ],
+        isMarket:false,
+      };
+    },
+    () => {
+      const fixed = pick([500000,800000,1000000,1200000]);
+      const varPerAcc = pick([12,15,18,20,25]);
+      const accounts = pick([30000,50000,75000,100000]);
+      const total = fixed + varPerAcc * accounts;
+      const revenuePerAcc = pick([60,80,100,120]);
+      const beAccounts = Math.ceil(fixed / (revenuePerAcc - varPerAcc));
+      return {
+        type:'Fixed vs. Variable Costs',
+        seconds:90,
+        text:`Capital One is evaluating a new secured credit card program for credit-building customers. Annual fixed costs (risk systems, compliance, dedicated team) are $${fmtN(fixed)}. Variable costs are $${varPerAcc}/account/year (credit bureau pulls, statement processing, fraud monitoring).\n\nRevenue is $${revenuePerAcc}/account/year.\n\n1. What is total annual cost at ${fmtN(accounts)} accounts?\n2. What is the breakeven account count?\n3. At what account volume does the program generate $${fmtN(fixed * 0.5)} in profit?`,
+        formula:`Total Cost = Fixed + (Variable/acct × Accounts) | Breakeven = Fixed ÷ (Revenue − Variable) | Profit target: (Rev−Var)×V − Fixed = Target`,
+        calc:`Cost at ${fmtN(accounts)}: $${fmtN(total)} | Breakeven: $${fmtN(fixed)}÷$${revenuePerAcc-varPerAcc} = ${fmtN(beAccounts)} accounts | Profit target: (${fmtN(beAccounts)} + ${fmtN(Math.ceil(fixed*0.5/(revenuePerAcc-varPerAcc)))}) accounts`,
+        rubric:[
+          'Correctly calculated total cost at the given volume',
+          'Applied breakeven formula: Fixed ÷ Contribution Margin per account',
+          'Set up the profit target equation and solved for volume',
+          'Recognized all three parts use the same contribution margin concept',
+        ],
+        isMarket:false,
+      };
+    },
+  ],
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let S = {
+  mode: 'quick',
+  cat: 'all',
+  score: 0,
+  streak: 0,
+  total: 0,
+  q: null,
+  timer: null,
+  timeLeft: 90,
+  maxTime: 90,
+  submitted: false,
+  graded: false,
+};
+
+// ─────────────────────────────────────────────
+// MODE & CATEGORY
+// ─────────────────────────────────────────────
+function setMode(m) {
+  S.mode = m;
+  document.getElementById('btnQuick').classList.toggle('active', m==='quick');
+  document.getElementById('btnDeep').classList.toggle('active', m==='deep');
+  loadQ();
+}
+
+function setCat(el) {
+  S.cat = el.dataset.cat;
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  loadQ();
+}
+
+// ─────────────────────────────────────────────
+// LOAD QUESTION
+// ─────────────────────────────────────────────
+function loadQ() {
+  S.submitted = false;
+  S.graded = false;
+  stopTimer();
+
+  const cats = Object.keys(BANK);
+  const cat = S.cat === 'all' ? cats[Math.floor(Math.random()*cats.length)] : S.cat;
+  const generators = BANK[cat];
+  S.q = generators[Math.floor(Math.random()*generators.length)]();
+
+  document.getElementById('qType').textContent = S.q.type;
+  document.getElementById('qText').textContent = S.q.text;
+
+  const stepList = document.getElementById('stepList');
+  if (S.q.isMarket && S.q.steps) {
+    stepList.innerHTML = '';
+    S.q.steps.forEach((s,i)=>{
+      const div = document.createElement('div');
+      div.className = 'step-row';
+      div.innerHTML = `<div class="step-num">${i+1}</div><div class="step-inner"><div class="step-label">${s.label}</div><textarea class="step-ta" rows="2" placeholder="${s.hint}"></textarea></div>`;
+      stepList.appendChild(div);
+    });
+    stepList.classList.remove('hidden');
+  } else {
+    stepList.classList.add('hidden');
+  }
+
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerCard').classList.remove('hidden');
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Submit Answer';
+  document.getElementById('feedbackPanel').classList.remove('show');
+  document.getElementById('nextBtn').classList.add('hidden');
+  document.getElementById('apiSetup').classList.add('hidden');
+  document.getElementById('timeoutBadge').classList.add('hidden');
+
+  S.maxTime = S.q.seconds || 90;
+  startTimer(S.maxTime);
+}
+
+// ─────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────
+function startTimer(s) {
+  S.timeLeft = s;
+  updateTimerUI();
+  S.timer = setInterval(()=>{
+    S.timeLeft--;
+    updateTimerUI();
+    if (S.timeLeft <= 0) {
+      stopTimer();
+      if (!S.submitted) submitAnswer(true);
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (S.timer) { clearInterval(S.timer); S.timer = null; }
+}
+
+function updateTimerUI() {
+  const pct = (S.timeLeft / S.maxTime) * 100;
+  const fill = document.getElementById('timerFill');
+  fill.style.width = pct + '%';
+  fill.style.background = S.timeLeft < 20 ? '#CC0000' : S.timeLeft < 45 ? '#D4A017' : 'var(--red)';
+  document.getElementById('timerText').textContent = S.timeLeft + 's';
+}
+
+// ─────────────────────────────────────────────
+// SUBMIT
+// ─────────────────────────────────────────────
+function submitAnswer(timedOut=false) {
+  if (S.submitted) return;
+  S.submitted = true;
+  stopTimer();
+  document.getElementById('submitBtn').disabled = true;
+
+  if (timedOut) {
+    document.getElementById('timeoutBadge').classList.remove('hidden');
+  }
+
+  const q = S.q;
+  document.getElementById('fbFormula').textContent = q.formula;
+  document.getElementById('fbCalc').textContent = q.calc;
+
+  const rangeBox = document.getElementById('rangeBox');
+  if (q.isMarket && q.range) {
+    document.getElementById('rangeVal').textContent = q.range;
+    rangeBox.classList.remove('hidden');
+  } else {
+    rangeBox.classList.add('hidden');
+  }
+
+  document.getElementById('feedbackPanel').classList.add('show');
+
+  if (S.mode === 'quick') {
+    showRubric();
+  } else {
+    showDeepFeedback(timedOut);
+  }
+}
+
+// ─────────────────────────────────────────────
+// QUICK MODE
+// ─────────────────────────────────────────────
+function showRubric() {
+  document.getElementById('rubricWrap').classList.remove('hidden');
+  document.getElementById('aiWrap').classList.add('hidden');
+
+  const list = document.getElementById('rubricList');
+  list.innerHTML = '';
+  S.q.rubric.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'rubric-row';
+    div.innerHTML = `<div class="rcheck" onclick="toggleCheck(this)"></div><span>${item}</span>`;
+    div.onclick = (e)=>{ if(e.target.tagName!=='DIV') toggleCheck(div.querySelector('.rcheck')); };
+    list.appendChild(div);
+  });
+
+  document.getElementById('gradeRow').querySelectorAll('.g-btn').forEach(b=>b.disabled=false);
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('on');
+  el.textContent = el.classList.contains('on') ? '✓' : '';
+}
+
+function grade(pts) {
+  if (S.graded) return;
+  S.graded = true;
+  S.total++;
+  S.score += pts;
+  S.streak = pts === 3 ? S.streak + 1 : 0;
+  updateStats();
+  document.getElementById('gradeRow').querySelectorAll('.g-btn').forEach(b=>b.disabled=true);
+  document.getElementById('nextBtn').classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────
+// DEEP MODE
+// ─────────────────────────────────────────────
+async function showDeepFeedback(timedOut) {
+  document.getElementById('rubricWrap').classList.add('hidden');
+  document.getElementById('aiWrap').classList.remove('hidden');
+  document.getElementById('apiSetup').classList.add('hidden');
+
+  const apiKey = localStorage.getItem('c1_api_key');
+  if (!apiKey) {
+    document.getElementById('apiSetup').classList.remove('hidden');
+    document.getElementById('aiWrap').classList.add('hidden');
+    return;
+  }
+
+  const aiBox = document.getElementById('aiBox');
+  aiBox.className = 'ai-box ai-loading';
+  aiBox.textContent = 'Evaluating your answer...';
+
+  const userAnswer = document.getElementById('answerInput').value.trim();
+  const stepAnswers = [...document.querySelectorAll('.step-ta')].map((el,i)=>`Step ${i+1}: ${el.value.trim()}`).filter(s=>!s.endsWith(': ')).join('\n');
+  const fullAnswer = [userAnswer, stepAnswers].filter(Boolean).join('\n\n') || '[No answer provided — timed out]';
+
+  const q = S.q;
+
+  try {
+    const res = await fetch('/.netlify/functions/evaluate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        qType: q.type,
+        question: q.text,
+        formula: q.formula,
+        workedExample: q.calc,
+        rubric: q.rubric,
+        userAnswer: fullAnswer,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    aiBox.className = 'ai-box';
+    aiBox.textContent = data.text;
+
+    const scoreMatch = data.text.match(/Score:\s*(\d)/);
+    if (scoreMatch && !S.graded) {
+      S.graded = true;
+      const s = parseInt(scoreMatch[1]);
+      const pts = s >= 4 ? 3 : s >= 3 ? 2 : 1;
+      S.score += pts;
+      S.streak = pts === 3 ? S.streak + 1 : 0;
+      S.total++;
+      updateStats();
+    }
+  } catch(e) {
+    aiBox.className = 'ai-box';
+    aiBox.textContent = `Could not get evaluation: ${e.message}\n\nCheck that ANTHROPIC_API_KEY is set in your Netlify environment variables.`;
+  }
+
+  document.getElementById('nextBtn').classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────
+// API KEY (fallback for direct key entry)
+// ─────────────────────────────────────────────
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    alert("That doesn't look like an Anthropic API key (should start with sk-ant-)");
+    return;
+  }
+  localStorage.setItem('c1_api_key', key);
+  document.getElementById('apiSetup').classList.add('hidden');
+  showDeepFeedback(false);
+}
+
+// ─────────────────────────────────────────────
+// STATS & NEXT
+// ─────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('statScore').textContent = S.score;
+  document.getElementById('statStreak').innerHTML = S.streak + ' <span class="streak-icon">&#128293;</span>';
+  document.getElementById('statTotal').textContent = S.total;
+}
+
+function nextQuestion() { loadQ(); }
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+loadQ();
+</script>
+</body>
+</html>
