@@ -18,7 +18,13 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.url.includes('/.netlify/functions/')) return;
   if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
+
+  // HTML: always try network first so updates land immediately
+  if (e.request.headers.get('accept')?.includes('text/html')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
+
+  // Everything else (manifest, icon, sw): cache-first
+  e.respondWith(caches.match(e.request).then(cached => cached || fetch(e.request)));
 });
