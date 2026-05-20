@@ -83,6 +83,15 @@
     .btn-secondary{width:100%;padding:12px;background:transparent;color:var(--off-white);border:1px solid var(--navy-lighter);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .15s}
     .btn-secondary:hover{background:var(--navy-lighter)}
 
+    /* MIC */
+    .mic-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+    .mic-btn{width:46px;height:46px;border-radius:50%;border:2px solid var(--navy-lighter);background:var(--navy);color:var(--off-white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;-webkit-tap-highlight-color:transparent}
+    .mic-btn.recording{background:var(--red);border-color:var(--red);animation:mic-pulse 1.4s infinite}
+    .mic-btn.unsupported{opacity:.3;cursor:not-allowed}
+    @keyframes mic-pulse{0%,100%{box-shadow:0 0 0 0 rgba(204,0,0,.5)}70%{box-shadow:0 0 0 12px rgba(204,0,0,0)}}
+    .mic-status{font-size:12px;color:var(--gray);line-height:1.5;flex:1}
+    .mic-status.active{color:var(--red);font-weight:700}
+
     /* FEEDBACK */
     .feedback{display:none}
     .feedback.show{display:flex;flex-direction:column;gap:10px}
@@ -191,6 +200,10 @@
   <div class="card" id="answerCard">
     <div class="ans-label">Your Reasoning &amp; Answer</div>
     <textarea id="answerInput" placeholder="State the formula first, then walk through your numbers. Explain any assumptions you're making."></textarea>
+    <div class="mic-row" id="micRow">
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Speak your answer">&#127908;</button>
+      <span class="mic-status" id="micStatus">Tap mic to speak — timer pauses while recording</span>
+    </div>
     <button class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
   </div>
 
@@ -285,6 +298,12 @@
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
+
+// Mic state — declared early so stopMic() is safe to call before voice section loads
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isRecording = false;
+let transcriptBase = '';
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -533,6 +552,7 @@ function setCat(el) {
 // ─────────────────────────────────────────────
 function loadQ() {
   S.submitted=false; S.graded=false;
+  stopMic();
   stopTimer();
 
   const cats=Object.keys(BANK);
@@ -601,7 +621,7 @@ function updateTimerUI(){
 // ─────────────────────────────────────────────
 function submitAnswer(timedOut=false){
   if(S.submitted)return;
-  S.submitted=true; stopTimer();
+  S.submitted=true; stopMic(); stopTimer();
   document.getElementById('submitBtn').disabled=true;
   if(timedOut)document.getElementById('timeoutBadge').classList.remove('hidden');
 
@@ -738,6 +758,67 @@ function toggleSheet(){
 }
 function closeSheetOnBackdrop(e){
   if(e.target===document.getElementById('sheetOverlay'))toggleSheet();
+}
+
+// ─────────────────────────────────────────────
+// VOICE INPUT
+// ─────────────────────────────────────────────
+if (!SR) {
+  document.getElementById('micBtn').classList.add('unsupported');
+  document.getElementById('micStatus').textContent = 'Voice not supported in this browser';
+}
+
+function toggleMic() {
+  if (!SR) return;
+  isRecording ? stopMic() : startMic();
+}
+
+function startMic() {
+  transcriptBase = document.getElementById('answerInput').value;
+  if (transcriptBase && !transcriptBase.endsWith(' ')) transcriptBase += ' ';
+
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) transcriptBase += t;
+      else interim += t;
+    }
+    document.getElementById('answerInput').value = transcriptBase + interim;
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error !== 'no-speech') stopMic();
+  };
+
+  // iOS Safari stops automatically; restart to keep it going
+  recognition.onend = () => { if (isRecording) recognition.start(); };
+
+  recognition.start();
+  isRecording = true;
+  stopTimer();
+
+  document.getElementById('micBtn').classList.add('recording');
+  const status = document.getElementById('micStatus');
+  status.textContent = 'Listening... tap to stop';
+  status.classList.add('active');
+}
+
+function stopMic() {
+  isRecording = false;
+  if (recognition) { recognition.stop(); recognition = null; }
+  if (S.submitted) return;
+  startTimer(S.timeLeft);
+
+  document.getElementById('micBtn').classList.remove('recording');
+  const status = document.getElementById('micStatus');
+  status.textContent = 'Tap mic to speak — timer pauses while recording';
+  status.classList.remove('active');
 }
 
 // ─────────────────────────────────────────────
