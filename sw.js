@@ -1,4 +1,4 @@
-const CACHE = 'c1prep-v2';
+const CACHE = 'c1prep-v3';
 const ASSETS = ['/', '/index.html', '/manifest.json', '/icon.svg'];
 
 self.addEventListener('install', e => {
