@@ -552,7 +552,7 @@ function setCat(el) {
 // ─────────────────────────────────────────────
 function loadQ() {
   S.submitted=false; S.graded=false;
-  stopMic();
+  stopMic(false);
   stopTimer();
 
   const cats=Object.keys(BANK);
@@ -601,6 +601,7 @@ function loadQ() {
 // TIMER
 // ─────────────────────────────────────────────
 function startTimer(s){
+  stopTimer();
   S.timeLeft=s; updateTimerUI();
   S.timer=setInterval(()=>{
     S.timeLeft--; updateTimerUI();
@@ -621,7 +622,7 @@ function updateTimerUI(){
 // ─────────────────────────────────────────────
 function submitAnswer(timedOut=false){
   if(S.submitted)return;
-  S.submitted=true; stopMic(); stopTimer();
+  S.submitted=true; stopMic(false); stopTimer();
   document.getElementById('submitBtn').disabled=true;
   if(timedOut)document.getElementById('timeoutBadge').classList.remove('hidden');
 
@@ -809,16 +810,16 @@ function startMic() {
   status.classList.add('active');
 }
 
-function stopMic() {
+function stopMic(resumeTimer=true) {
   isRecording = false;
   if (recognition) { recognition.stop(); recognition = null; }
-  if (S.submitted) return;
-  startTimer(S.timeLeft);
 
   document.getElementById('micBtn').classList.remove('recording');
   const status = document.getElementById('micStatus');
   status.textContent = 'Tap mic to speak — timer pauses while recording';
   status.classList.remove('active');
+
+  if (resumeTimer && !S.submitted) startTimer(S.timeLeft);
 }
 
 // ─────────────────────────────────────────────
