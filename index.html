@@ -65,7 +65,10 @@
     .step-row{display:flex;gap:8px;align-items:flex-start}
     .step-num{background:var(--red);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:14px}
     .step-inner{flex:1}
-    .step-label{font-size:10px;color:var(--gray);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .step-label{font-size:10px;color:var(--gray);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between}
+    .hint-toggle{font-size:9px;font-weight:700;color:var(--gray);background:none;border:1px solid var(--navy-lighter);border-radius:4px;padding:1px 6px;cursor:pointer;letter-spacing:.3px;flex-shrink:0}
+    .hint-toggle:hover{color:var(--off-white);border-color:var(--gray)}
+    .hint-text{display:none;font-size:11px;color:#7A9FBF;background:var(--navy);border:1px solid var(--navy-lighter);border-radius:5px;padding:5px 8px;margin-bottom:4px;line-height:1.5;font-family:monospace}
     .step-ta{width:100%;background:var(--navy);border:1px solid var(--navy-lighter);border-radius:6px;padding:7px 9px;color:var(--off-white);font-size:13px;resize:none;font-family:inherit;line-height:1.5}
     .step-ta:focus{outline:none;border-color:var(--red)}
 
@@ -712,7 +715,7 @@ function loadQ() {
     S.q.steps.forEach((s,i)=>{
       const div=document.createElement('div');
       div.className='step-row';
-      div.innerHTML=`<div class="step-num">${i+1}</div><div class="step-inner"><div class="step-label">${s.label}</div><textarea class="step-ta" rows="2" placeholder="${s.hint}"></textarea></div>`;
+      div.innerHTML=`<div class="step-num">${i+1}</div><div class="step-inner"><div class="step-label"><span>${s.label}</span><button class="hint-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block';this.textContent=this.textContent==='Hint'?'Hide':'Hint'">Hint</button></div><div class="hint-text">${s.hint}</div><textarea class="step-ta" rows="2" placeholder="Your answer…"></textarea></div>`;
       stepList.appendChild(div);
     });
     stepList.classList.remove('hidden');
