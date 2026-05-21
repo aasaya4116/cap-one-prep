@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital One PM Interview — Cheat Sheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  :root{
+    --red:#CC0000;
+    --navy:#0D1B2A;
+    --navy-light:#1E3350;
+    --gold:#C8973A;
+    --gray:#4A5568;
+    --light:#F7F9FC;
+    --border:#E2E8F0;
+  }
+
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:#fff;
+    color:var(--navy);
+    font-size:10.5pt;
+    line-height:1.5;
+  }
+
+  /* ── PRINT SETUP ── */
+  @page{ size:letter; margin:0.55in 0.6in; }
+  @media print{
+    body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .page-break{ page-break-after:always; break-after:page; }
+    .no-break{ page-break-inside:avoid; break-inside:avoid; }
+  }
+
+  /* ── HEADER ── */
+  .page-header{
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:3px solid var(--red);
+    padding-bottom:10px; margin-bottom:20px;
+  }
+  .header-left h1{ font-size:15pt; font-weight:800; color:var(--navy); letter-spacing:-.3px; }
+  .header-left p{ font-size:8.5pt; color:var(--gray); margin-top:2px; }
+  .header-badge{
+    background:var(--red); color:#fff;
+    font-size:8pt; font-weight:700;
+    padding:4px 12px; border-radius:20px;
+    letter-spacing:.5px; text-transform:uppercase;
+  }
+
+  /* ── SECTION LABELS ── */
+  .section-title{
+    font-size:7.5pt; font-weight:800; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--red);
+    margin-bottom:10px; padding-bottom:5px;
+    border-bottom:1px solid var(--border);
+  }
+
+  /* ── FRAMEWORK CARDS ── */
+  .framework{
+    background:var(--light); border-radius:8px;
+    border:1px solid var(--border);
+    border-left:4px solid var(--red);
+    padding:13px 15px; margin-bottom:12px;
+  }
+  .framework-name{
+    font-size:11pt; font-weight:800; color:var(--navy);
+    margin-bottom:3px;
+  }
+  .framework-when{
+    font-size:8pt; color:var(--gold); font-weight:600;
+    text-transform:uppercase; letter-spacing:.5px;
+    margin-bottom:9px;
+  }
+  .steps{ display:flex; flex-direction:column; gap:5px; }
+  .step{ display:flex; gap:10px; align-items:flex-start; }
+  .step-num{
+    background:var(--red); color:#fff;
+    min-width:18px; height:18px; border-radius:50%;
+    font-size:8pt; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin-top:1px;
+  }
+  .step-body{ flex:1; }
+  .step-label{ font-weight:700; font-size:9.5pt; color:var(--navy); }
+  .step-desc{ font-size:8.5pt; color:var(--gray); margin-top:1px; }
+
+  .tip-box{
+    background:#FFF8F0; border:1px solid #F6D860;
+    border-radius:6px; padding:8px 11px;
+    font-size:8pt; color:#7A5700;
+    margin-top:9px;
+  }
+  .tip-box strong{ font-weight:700; }
+
+  /* ── PAGE 2: EXAMPLES ── */
+  .example{
+    background:var(--light); border-radius:8px;
+    border:1px solid var(--border);
+    border-left:4px solid var(--navy);
+    padding:13px 15px; margin-bottom:12px;
+  }
+  .example-num{
+    font-size:7.5pt; font-weight:800; letter-spacing:1px;
+    text-transform:uppercase; color:var(--gray); margin-bottom:2px;
+  }
+  .example-title{
+    font-size:11.5pt; font-weight:800; color:var(--navy); margin-bottom:8px;
+  }
+  .star-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+  .star-cell{ display:flex; flex-direction:column; gap:3px; }
+  .star-label{
+    font-size:7pt; font-weight:800; letter-spacing:1px;
+    text-transform:uppercase; color:var(--red);
+  }
+  .star-text{ font-size:8.5pt; color:var(--navy); line-height:1.45; }
+  .result-row{
+    background:#EAF4EE; border-radius:5px;
+    padding:7px 10px; margin-bottom:6px;
+  }
+  .result-row .star-label{ color:var(--navy-light); }
+  .c1-bridge{
+    background:#EEF2FF; border-radius:5px;
+    padding:7px 10px; font-size:8pt; color:#2D3A8C;
+    display:flex; gap:8px; align-items:flex-start;
+  }
+  .c1-bridge-icon{ font-weight:800; flex-shrink:0; }
+
+  /* ── FOOTER ── */
+  .page-footer{
+    margin-top:18px; padding-top:8px;
+    border-top:1px solid var(--border);
+    display:flex; justify-content:space-between;
+    font-size:7.5pt; color:#A0AEC0;
+  }
+
+  /* ── SUMMARY BOX ── */
+  .summary-box{
+    background:var(--navy); color:#fff;
+    border-radius:8px; padding:12px 15px;
+    margin-bottom:14px; display:grid;
+    grid-template-columns:repeat(3,1fr); gap:12px;
+  }
+  .sum-item{}
+  .sum-label{ font-size:7pt; letter-spacing:1px; text-transform:uppercase; color:#7A8FA6; margin-bottom:3px; }
+  .sum-val{ font-size:9pt; font-weight:700; color:#fff; line-height:1.4; }
+
+  /* ── FORMULA STRIP ── */
+  .formula-strip{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+    margin-bottom:14px;
+  }
+  .f-card{
+    background:var(--light); border:1px solid var(--border);
+    border-top:3px solid var(--red); border-radius:6px;
+    padding:8px 10px;
+  }
+  .f-card.highlight{
+    background:#FFF3F3; border-color:#F8BABA;
+    border-top-color:var(--red);
+  }
+  .f-name{ font-size:7.5pt; font-weight:800; color:var(--navy); margin-bottom:3px; }
+  .f-formula{ font-size:9pt; font-weight:700; color:var(--red); font-family:monospace; margin-bottom:3px; }
+  .f-example{ font-size:7.5pt; color:var(--gray); line-height:1.4; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     PAGE 1 — PRODUCT DISCOVERY FRAMEWORKS
+═══════════════════════════════════════ -->
+
+<div class="page-header">
+  <div class="header-left">
+    <h1>Capital One PM Interview — Cheat Sheet</h1>
+    <p>Adebowale Asaya &nbsp;·&nbsp; Senior Manager, Product Management &nbsp;·&nbsp; Customer Servicing US Card</p>
+  </div>
+  <div class="header-badge">Product Discovery</div>
+</div>
+
+<div class="section-title">3 Universal Discovery Frameworks</div>
+
+<!-- FRAMEWORK 1 -->
+<div class="framework no-break">
+  <div class="framework-name">Framework 1 &nbsp;—&nbsp; PSID</div>
+  <div class="framework-when">Use when: prompt is open-ended &nbsp;("how would you discover what to build for X customer?")</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">P</div>
+      <div class="step-body">
+        <div class="step-label">Problem Space</div>
+        <div class="step-desc">Name the broad customer pain. Resist jumping to solutions. "Customers calling in about balance confusion" not "we need a dashboard."</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">S</div>
+      <div class="step-body">
+        <div class="step-label">Segment</div>
+        <div class="step-desc">Narrow to one persona before going deep. "I'd focus on the revolver who carries $2K+ and calls in monthly — not the transactor."</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">I</div>
+      <div class="step-body">
+        <div class="step-label">Insight Method</div>
+        <div class="step-desc">How would you learn the real cause? Call transcript analysis, support ticket clustering, session replay, 1:1 interviews with reps and customers.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">D</div>
+      <div class="step-body">
+        <div class="step-label">Direction Hypothesis</div>
+        <div class="step-desc">Based on what you'd expect to find, state your hypothesis for where to play — and what would change it.</div>
+      </div>
+    </div>
+  </div>
+  <div class="tip-box"><strong>Capital One signal:</strong> Name the data sources you'd actually use at C1 — IVR logs, servicing call transcripts, digital drop-off funnels, NPS verbatims.</div>
+</div>
+
+<!-- FRAMEWORK 2 -->
+<div class="framework no-break">
+  <div class="framework-name">Framework 2 &nbsp;—&nbsp; Jobs-to-be-Done + Friction Map</div>
+  <div class="framework-when">Use when: given a specific product area &nbsp;("design a feature for cardholders who carry a balance")</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-label">State the Job</div>
+        <div class="step-desc">"When I [situation], I want to [motivation], so I can [outcome]." &nbsp; Ex: "When I see a charge I don't recognize, I want instant clarity, so I can decide whether to dispute without calling."</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-label">Map the Friction</div>
+        <div class="step-desc">Where does the current experience fail that job? Walk through: Awareness → Action → Resolution → Trust. Pick the highest-friction moment.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-label">Design Toward It</div>
+        <div class="step-desc">Propose a solution targeted at that single friction point. Breadth of ideas shows creativity; deliberate narrowing shows maturity.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-label">Validation Criteria</div>
+        <div class="step-desc">What signal tells you the job is being done? (Call deflection rate, digital resolution %, time-to-resolution, CSAT on that flow)</div>
+      </div>
+    </div>
+  </div>
+  <div class="tip-box"><strong>Capital One signal:</strong> Tie validation metrics to servicing KPIs C1 actually cares about — call deflection, digital containment, first-contact resolution, NPS on servicing interactions.</div>
+</div>
+
+<!-- FRAMEWORK 3 -->
+<div class="framework no-break">
+  <div class="framework-name">Framework 3 &nbsp;—&nbsp; NOW / NEXT / NEVER</div>
+  <div class="framework-when">Use when: you need to show prioritization discipline after generating ideas</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">✓</div>
+      <div class="step-body">
+        <div class="step-label">NOW</div>
+        <div class="step-desc">Solves the validated pain, low regulatory risk, fast learning loop. Can ship or test in the near term.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">→</div>
+      <div class="step-body">
+        <div class="step-label">NEXT</div>
+        <div class="step-desc">High potential but needs more discovery, has dependencies, or regulatory review required before proceeding.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">✕</div>
+      <div class="step-body">
+        <div class="step-label">NEVER (for now)</div>
+        <div class="step-desc">Solves a different problem than what we validated. Intellectually interesting but not addressing the job-to-be-done.</div>
+      </div>
+    </div>
+  </div>
+  <div class="tip-box"><strong>Capital One signal:</strong> Saying "never for now" out loud signals you're not in love with your own ideas — a senior PM behavior. In a regulated bank, also flag compliance review as a gating factor for NEXT-tier ideas.</div>
+</div>
+
+<div class="page-footer">
+  <span>Adebowale Asaya &nbsp;·&nbsp; Capital One Interview Prep</span>
+  <span>Page 1 of 2</span>
+</div>
+
+<!-- PAGE BREAK -->
+<div class="page-break"></div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 2 — PRODUCT SKILLS EXAMPLES
+═══════════════════════════════════════ -->
+
+<div class="page-header">
+  <div class="header-left">
+    <h1>Capital One PM Interview — Cheat Sheet</h1>
+    <p>Adebowale Asaya &nbsp;·&nbsp; Senior Manager, Product Management &nbsp;·&nbsp; Customer Servicing US Card</p>
+  </div>
+  <div class="header-badge">Product Skills</div>
+</div>
+
+<div class="section-title">Case Math Quick Reference — 6 Core Formulas</div>
+
+<div class="formula-strip no-break">
+
+  <div class="f-card">
+    <div class="f-name">Breakeven Units</div>
+    <div class="f-formula">Fixed Cost ÷ (Price − Var Cost)</div>
+    <div class="f-example">$500K ÷ ($50 − $20) = <strong>16,667 units</strong></div>
+  </div>
+
+  <div class="f-card">
+    <div class="f-name">Expected Value</div>
+    <div class="f-formula">Σ (Probability × Outcome)</div>
+    <div class="f-example">0.6×$200K + 0.4×−$80K = <strong>$88K</strong></div>
+  </div>
+
+  <div class="f-card">
+    <div class="f-name">Weighted Average</div>
+    <div class="f-formula">Σ (Weight × Value) ÷ Σ Weights</div>
+    <div class="f-example">0.7×92 + 0.3×78 = <strong>87.8</strong></div>
+  </div>
+
+  <div class="f-card">
+    <div class="f-name">Market Sizing</div>
+    <div class="f-formula">Population × TAM% × Price</div>
+    <div class="f-example">330M × 4% × $120 = <strong>$1.6B</strong></div>
+  </div>
+
+  <div class="f-card">
+    <div class="f-name">Fixed vs Variable Cost</div>
+    <div class="f-formula">Total = Fixed + (VarCost × Units)</div>
+    <div class="f-example">$200K + ($15 × 50K) = <strong>$950K</strong></div>
+  </div>
+
+  <div class="f-card highlight">
+    <div class="f-name">★ Avg Lifetime / LTV</div>
+    <div class="f-formula">Lifetime = 1 ÷ Churn Rate</div>
+    <div class="f-example">1÷0.05 = 20 mo &nbsp;·&nbsp; $8×20 = <strong>$160 LTV</strong><br>Portfolio: 200K × $160 = <strong>$32M</strong></div>
+  </div>
+
+</div>
+
+<div class="section-title">4 Flagship Examples — Product Skills Interview</div>
+
+<div class="summary-box">
+  <div class="sum-item">
+    <div class="sum-label">Evaluation Pillars</div>
+    <div class="sum-val">Product Strategy &nbsp;·&nbsp; Customer-Centricity &nbsp;·&nbsp; Analytical Rigor &nbsp;·&nbsp; Cross-Functional Leadership &nbsp;·&nbsp; Regulated Execution</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-label">Role Context</div>
+    <div class="sum-val">Customer Servicing US Card — reducing customer effort, call deflection, digital self-service, compliance</div>
+  </div>
+  <div class="sum-item">
+    <div class="sum-label">Delivery Format</div>
+    <div class="sum-val">STAR &nbsp;(Situation → Task → Action → Result) &nbsp;· &nbsp;2–3 min per example &nbsp;·&nbsp; Lead with the outcome</div>
+  </div>
+</div>
+
+<!-- EXAMPLE 1 -->
+<div class="example no-break">
+  <div class="example-num">Example 1 &nbsp;·&nbsp; AI / ML Product Leadership</div>
+  <div class="example-title">Built ML-Powered Search Platform from Zero — NPS +42, 22% Search Completion Lift</div>
+  <div class="star-grid">
+    <div class="star-cell">
+      <div class="star-label">Situation</div>
+      <div class="star-text">Amazon's internal catalog had fragmented discovery across multiple systems. Users couldn't find what they needed, driving downstream procurement errors and friction.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Task</div>
+      <div class="star-text">Own zero-to-one build of a unified ML search platform, leading a team of 5 engineers (Data Science + Backend) with no existing infrastructure to build on.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Action</div>
+      <div class="star-text">Designed NLP-based entity extraction and attribute weighting across 30K+ SKUs. Built an experimentation roadmap to tune relevance scoring iteratively. Established metadata quality standards with Finance and Legal for auditability.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Result</div>
+      <div class="star-text">NPS of <strong>+42</strong>. Relevance scoring improved <strong>28%</strong>. CTR up <strong>18%</strong>. Successful search completion up <strong>22%</strong>.</div>
+    </div>
+  </div>
+  <div class="c1-bridge">
+    <div class="c1-bridge-icon">C1 →</div>
+    <div>Capital One's servicing channels face the same problem: customers who can't find answers self-serve in app or IVR call in. This story demonstrates I know how to build intelligent search that reduces friction at scale — directly applicable to dispute lookup, payment assistance, and reward redemption flows.</div>
+  </div>
+</div>
+
+<!-- EXAMPLE 2 -->
+<div class="example no-break">
+  <div class="example-num">Example 2 &nbsp;·&nbsp; Platform Strategy at Scale</div>
+  <div class="example-title">Owned 3-Year Roadmap for Enterprise Platform Serving 750,000+ Users — 27% YoY Defect Reduction</div>
+  <div class="star-grid">
+    <div class="star-cell">
+      <div class="star-label">Situation</div>
+      <div class="star-text">An internal procurement platform serving 750K+ Amazon corporate employees had accrued significant technical debt and compliance risk, with no unified product strategy.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Task</div>
+      <div class="star-text">Set and execute a 3-year roadmap, ship 20+ features focused on spend governance and compliance, and drive measurable quality improvements at global scale.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Action</div>
+      <div class="star-text">Prioritized spend governance and auditability as platform foundation. Launched QuickSight/SQL dashboards to instrument system health. Led global rollout of purchase request system, onboarding 10,000+ users with PO validation.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Result</div>
+      <div class="star-text"><strong>27% YoY reduction in defects.</strong> 10,000+ users onboarded globally. Audit-ready traceability established across Finance, Legal, and Engineering stakeholders.</div>
+    </div>
+  </div>
+  <div class="c1-bridge">
+    <div class="c1-bridge-icon">C1 →</div>
+    <div>Capital One's card servicing platform serves millions of cardholders under regulatory scrutiny. This story shows I've owned long-horizon product strategy, driven quality at massive scale, and built compliance into the product — not bolted it on after.</div>
+  </div>
+</div>
+
+<!-- EXAMPLE 3 -->
+<div class="example no-break">
+  <div class="example-num">Example 3 &nbsp;·&nbsp; Operational Transformation in a Regulated Environment</div>
+  <div class="example-title">Reduced Government Procurement Cycle from 28 Days to 5 Days Through Process Redesign</div>
+  <div class="star-grid">
+    <div class="star-cell">
+      <div class="star-label">Situation</div>
+      <div class="star-text">AWS's government procurement process averaged 28 days per cycle — creating delays in data center operations and risk exposure in a compliance-critical environment.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Task</div>
+      <div class="star-text">Redesign the procurement workflow to eliminate cycle time while maintaining full regulatory compliance and auditability for government contracts.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Action</div>
+      <div class="star-text">Implemented standardized Master Work Orders as a reusable compliance template. Trained internal teams on compliant workflows to eliminate rework loops. Partnered with Legal to ensure every shortcut was a safe shortcut.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Result</div>
+      <div class="star-text">Cycle time dropped from <strong>28 days to 5 days — an 82% reduction</strong> — without any compliance exceptions. Process adopted across the organization.</div>
+    </div>
+  </div>
+  <div class="c1-bridge">
+    <div class="c1-bridge-icon">C1 →</div>
+    <div>Customer servicing is fundamentally about cycle time under compliance pressure — dispute resolution, hardship processing, account corrections. This story shows I redesign complex, regulated workflows for speed without creating risk, which is the exact tension a CS PM at Capital One manages daily.</div>
+  </div>
+</div>
+
+<!-- EXAMPLE 4 -->
+<div class="example no-break">
+  <div class="example-num">Example 4 &nbsp;·&nbsp; Strategic Build vs. Buy Decision</div>
+  <div class="example-title">Led Buy-vs-Build Analysis for AI-Native Sourcing Platform — Evaluated 3 Enterprise Vendors on TCO, Fit, and Risk</div>
+  <div class="star-grid">
+    <div class="star-cell">
+      <div class="star-label">Situation</div>
+      <div class="star-text">Amazon needed to modernize procurement workflows for 2,000+ global users. Leadership was split between building in-house and acquiring an AI-native SaaS platform.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Task</div>
+      <div class="star-text">Lead a rigorous buy-vs-build evaluation, synthesize findings for executive decision-making, and align Engineering, Finance, and Legal on the path forward.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Action</div>
+      <div class="star-text">Ran structured analysis across Fairmarkit, Zip, and TealBook — evaluating technical fit, integration complexity, and TCO. Facilitated cross-functional sessions to surface compliance requirements and data security constraints that eliminated two candidates.</div>
+    </div>
+    <div class="star-cell">
+      <div class="star-label">Result</div>
+      <div class="star-text">Delivered a clear recommendation with executive alignment. Cross-functional team — Engineering, Finance, Legal — committed to a single direction without escalation.</div>
+    </div>
+  </div>
+  <div class="c1-bridge">
+    <div class="c1-bridge-icon">C1 →</div>
+    <div>Senior PM roles at Capital One regularly face build-vs-buy decisions for servicing technology — IVR systems, CRM tools, AI-assist platforms for agents. This story demonstrates I drive those decisions with rigor, bring the right stakeholders along, and reach alignment without paralysis.</div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Adebowale Asaya &nbsp;·&nbsp; Capital One Interview Prep</span>
+  <span>Page 2 of 2</span>
+</div>
+
+</body>
+</html>

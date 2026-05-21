@@ -183,6 +183,7 @@
   <button class="cat-pill" data-cat="market" onclick="setCat(this)">Market Sizing</button>
   <button class="cat-pill" data-cat="weighted" onclick="setCat(this)">Weighted Avg</button>
   <button class="cat-pill" data-cat="costs" onclick="setCat(this)">Fixed/Variable</button>
+  <button class="cat-pill" data-cat="case" onclick="setCat(this)">Product Case ★</button>
 </div>
 
 <main>
@@ -514,6 +515,140 @@ const BANK = {
         isMarket:false};
     },
   ],
+
+  case: [
+    () => {
+      const users = pick([3000000,5000000,8000000,10000000]);
+      const paidPrice = pick([6,8,10,12]);
+      const paidConvPct = pick([3,4,5,6]);
+      const paidChurnPct = pick([4,5,6]);
+      const premPrice = Math.round(paidPrice * pick([1.4,1.5,1.6]) / 2) * 2;
+      const premConvPct = pick([1.0,1.5,2.0,2.5]);
+      const premChurnPct = pick([2,3,4]);
+      const interchange = pick([1.00,1.25,1.50,2.00]);
+
+      const paidSubs = Math.round(users * paidConvPct / 100);
+      const paidLife = Math.round(1 / (paidChurnPct / 100));
+      const paidLTV = paidSubs * paidLife * paidPrice;
+      const paidInterchangeLTV = paidSubs * paidLife * interchange;
+
+      const premSubs = Math.round(users * premConvPct / 100);
+      const premLife = parseFloat((1 / (premChurnPct / 100)).toFixed(1));
+      const premLTV = premSubs * premLife * premPrice;
+      const freeInterchangeLTV = users * premLife * interchange;
+      const totalBLTV = premLTV + freeInterchangeLTV;
+      const totalALTV = paidLTV + paidInterchangeLTV;
+
+      return {
+        type:'Product Case', seconds:180,
+        text:`Capital One is deciding between two monetization models for a new in-app budgeting feature.\nCurrent mobile banking customers: ${fmtN(users)}\n\nOption A — Paid Only\n• $${paidPrice}/month subscription\n• Signup rate: ${paidConvPct}% of existing customers\n• Monthly churn: ${paidChurnPct}%\n\nOption B — Freemium\n• Free basic tools for everyone\n• Premium tier at $${premPrice}/month\n• Premium conversion: ${premConvPct}% of customers\n• Monthly churn (premium): ${premChurnPct}%\n• Engagement lift generates $${interchange}/month additional interchange per active user\n\nWhich option do you recommend? Use average lifetime (1 ÷ churn rate) for LTV. Challenge any assumptions in the framing before solving.`,
+        formula:`Average Lifetime = 1 ÷ Monthly Churn Rate\nLTV = Monthly Revenue × Average Lifetime\nPortfolio Value = Subscribers × LTV`,
+        calc:`A: ${fmtN(paidSubs)} × ${paidLife} mo × $${paidPrice} = $${fmtN(Math.round(paidLTV/1e6*10)/10)}M sub + $${fmtN(Math.round(paidInterchangeLTV/1e6*10)/10)}M interchange = $${fmtN(Math.round(totalALTV/1e6*10)/10)}M\nB: ${fmtN(premSubs)} × ${premLife} mo × $${premPrice} + ${fmtN(users)} × ${premLife} × $${interchange} = $${fmtN(Math.round(totalBLTV/1e6*10)/10)}M`,
+        rubric:[
+          `Challenged whether $${interchange} interchange applies to Option A subscribers too (it does)`,
+          `Option A lifetime: 1 ÷ ${paidChurnPct/100} = ${paidLife} months | Option B: 1 ÷ ${premChurnPct/100} = ${premLife} months`,
+          'Identified interchange on full ${fmtN(users)}-user free base as the dominant variable',
+          'Calculated portfolio LTV (subscribers × monthly revenue × lifetime) for both options',
+          'Made a clear recommendation with at least one condition to validate',
+        ],
+        isMarket:true,
+        steps:[
+          {label:'Option A: Subscribers + avg lifetime',hint:`${fmtN(users)} × ${paidConvPct}% = ${fmtN(paidSubs)} | 1 ÷ ${paidChurnPct/100} = ${paidLife} months`},
+          {label:'Option A: Subscription LTV + interchange LTV',hint:`${fmtN(paidSubs)} × ${paidLife} × $${paidPrice} + ${fmtN(paidSubs)} × ${paidLife} × $${interchange} = $${fmtN(Math.round(totalALTV/1e6*10)/10)}M`},
+          {label:'Option B: Premium subs + avg lifetime',hint:`${fmtN(users)} × ${premConvPct}% = ${fmtN(premSubs)} | 1 ÷ ${premChurnPct/100} = ${premLife} months`},
+          {label:'Option B: Premium LTV + free user interchange LTV',hint:`${fmtN(premSubs)} × ${premLife} × $${premPrice} + ${fmtN(users)} × ${premLife} × $${interchange} = $${fmtN(Math.round(totalBLTV/1e6*10)/10)}M`},
+          {label:'Challenge the framing + recommend with a caveat',hint:`Does interchange apply to Option A too? What single assumption would flip your recommendation?`},
+        ],
+        range:`Option A total LTV: ~$${fmtN(Math.round(totalALTV/1e6*10)/10)}M | Option B total LTV: ~$${fmtN(Math.round(totalBLTV/1e6*10)/10)}M`,
+      };
+    },
+    () => {
+      const cardholders = pick([1000000,2000000,3000000,5000000]);
+      const convA = pick([4,5,6,8]);
+      const revA = pick([15,18,20,22]);
+      const churnA = pick([5,6,8]);
+      const convB = pick([1,1.5,2,2.5]);
+      const revB = pick([28,32,36,40]);
+      const churnB = pick([2,3,4]);
+
+      const subsA = Math.round(cardholders * convA / 100);
+      const lifeA = Math.round(1 / (churnA / 100));
+      const ltvA = subsA * lifeA * revA;
+
+      const subsB = Math.round(cardholders * convB / 100);
+      const lifeB = Math.round(1 / (churnB / 100));
+      const ltvB = subsB * lifeB * revB;
+      const winner = ltvA >= ltvB ? 'A' : 'B';
+      const loser = winner === 'A' ? 'B' : 'A';
+
+      return {
+        type:'Product Case', seconds:180,
+        text:`Capital One is choosing which credit card product to launch next. Eligible cardholder base: ${fmtN(cardholders)}\n\nOption A — No-Fee Cash Back Card\n• Estimated adoption: ${convA}% of eligible base\n• Net monthly revenue per active cardholder: $${revA} (interchange + cross-sell)\n• Monthly churn: ${churnA}%\n\nOption B — Premium Travel Card\n• Estimated adoption: ${convB}% of eligible base\n• Net monthly revenue per active cardholder: $${revB} (annual fee + interchange + travel partners)\n• Monthly churn: ${churnB}%\n\nWhich generates more total portfolio lifetime value? What does this imply about which product to prioritize — and what hidden assumption in the framing should you challenge?`,
+        formula:`LTV per customer = Monthly Revenue × (1 ÷ Monthly Churn Rate)\nPortfolio LTV = Subscribers × LTV per customer`,
+        calc:`A: ${fmtN(subsA)} × ${lifeA} months × $${revA} = $${fmtN(Math.round(ltvA/1e6*10)/10)}M | B: ${fmtN(subsB)} × ${lifeB} months × $${revB} = $${fmtN(Math.round(ltvB/1e6*10)/10)}M → Option ${winner} wins`,
+        rubric:[
+          `Option A lifetime: 1 ÷ ${churnA/100} = ${lifeA} months — lower churn partially offsets lower revenue in Option B`,
+          `Option B lifetime: 1 ÷ ${churnB/100} = ${lifeB} months`,
+          'Recognized that higher adoption × lower revenue vs. lower adoption × higher revenue is the core tension',
+          `Correctly identified Option ${winner} as the higher portfolio LTV`,
+          `Challenged a hidden assumption — e.g., are the adoption rates realistic? Does churn differ by customer segment?`,
+        ],
+        isMarket:true,
+        steps:[
+          {label:'Option A: Adopters + avg lifetime',hint:`${fmtN(cardholders)} × ${convA}% = ${fmtN(subsA)} | 1 ÷ ${churnA/100} = ${lifeA} months`},
+          {label:'Option A: Portfolio LTV',hint:`${fmtN(subsA)} × ${lifeA} months × $${revA} = $${fmtN(Math.round(ltvA/1e6*10)/10)}M`},
+          {label:'Option B: Adopters + avg lifetime',hint:`${fmtN(cardholders)} × ${convB}% = ${fmtN(subsB)} | 1 ÷ ${churnB/100} = ${lifeB} months`},
+          {label:'Option B: Portfolio LTV',hint:`${fmtN(subsB)} × ${lifeB} months × $${revB} = $${fmtN(Math.round(ltvB/1e6*10)/10)}M`},
+          {label:`Option ${winner} wins — now challenge one assumption`,hint:`What if Option ${loser}'s adoption rate is off by 2x? What would flip the outcome?`},
+        ],
+        range:`Option A: ~$${fmtN(Math.round(ltvA/1e6*10)/10)}M | Option B: ~$${fmtN(Math.round(ltvB/1e6*10)/10)}M`,
+      };
+    },
+    () => {
+      const users = pick([2000000,4000000,6000000,8000000]);
+      const callsPerUser = pick([0.3,0.4,0.5,0.6]);
+      const costPerCall = pick([8,10,12,15]);
+      const totalCallCost = Math.round(users * callsPerUser * costPerCall / 1e6 * 10) / 10;
+
+      const agentCount = pick([50,75,100,150]);
+      const agentCostPerMo = pick([4000,5000,6000]);
+      const agentCallReduction = pick([10,15,20]);
+      const agentFixedCost = agentCount * agentCostPerMo;
+
+      const aiBuildCost = pick([3000000,5000000,8000000]);
+      const aiCallReduction = pick([25,30,35,40]);
+      const aiMaintenance = pick([50000,75000,100000]);
+      const callsDeflectedByAI = Math.round(users * callsPerUser * aiCallReduction / 100);
+      const aiMonthlySavings = Math.round(callsDeflectedByAI * costPerCall / 1e6 * 10) / 10;
+      const aiPaybackMonths = Math.round(aiBuildCost / ((callsDeflectedByAI * costPerCall) - aiMaintenance));
+
+      const agentMonthlySavings = Math.round(users * callsPerUser * agentCallReduction / 100 * costPerCall / 1e6 * 10) / 10;
+      const agentNetCost = Math.round((agentFixedCost - (users * callsPerUser * agentCallReduction / 100 * costPerCall)) / 1e3);
+
+      return {
+        type:'Product Case', seconds:180,
+        text:`Capital One's card servicing operation handles ${(users * callsPerUser / 1e6).toFixed(1)}M calls/month at $${costPerCall}/call — $${totalCallCost}M/month total. You must reduce this cost. Two options:\n\nOption A — Hire Agents\n• Add ${agentCount} agents at $${fmtN(agentCostPerMo)}/agent/month\n• Reduces call volume by ${agentCallReduction}% through shorter wait times and fewer repeat calls\n• No fixed build cost\n\nOption B — Build AI Self-Service\n• One-time build cost: $${fmtN(aiBuildCost)}\n• Reduces call volume by ${aiCallReduction}% through digital deflection\n• Ongoing maintenance: $${fmtN(aiMaintenance)}/month\n\nCompare the monthly net cost of each option. How many months until Option B pays back its build cost? Which do you recommend and why?`,
+        formula:`Monthly savings = Calls deflected × Cost per call\nNet monthly cost = Fixed cost − Savings\nPayback = Build cost ÷ Monthly net savings`,
+        calc:`A: saves ${agentCallReduction}% × ${(users*callsPerUser/1e6).toFixed(1)}M calls × $${costPerCall} = $${agentMonthlySavings}M/mo, costs $${fmtN(agentFixedCost)}/mo | B: saves ${aiCallReduction}% deflection = $${aiMonthlySavings}M/mo, costs $${fmtN(aiMaintenance)}/mo maintenance | B payback: ~${aiPaybackMonths} months`,
+        rubric:[
+          'Calculated monthly call savings for both options (deflection rate × volume × cost per call)',
+          'Computed net monthly cost = agent/maintenance cost − savings',
+          `Calculated Option B payback: $${fmtN(aiBuildCost)} build ÷ monthly net savings`,
+          'Challenged a hidden assumption — does agent hiring actually reduce repeat calls? Is ${aiCallReduction}% deflection realistic?',
+          'Made a recommendation that accounts for payback period AND strategic value (data, scalability)',
+        ],
+        isMarket:true,
+        steps:[
+          {label:'Baseline: monthly call cost',hint:`${fmtN(users)} users × ${callsPerUser} calls/user × $${costPerCall} = $${totalCallCost}M/month`},
+          {label:'Option A: monthly savings vs. cost',hint:`${agentCallReduction}% reduction × ${(users*callsPerUser/1e6).toFixed(1)}M calls × $${costPerCall} = $${agentMonthlySavings}M saved | Agent cost: $${fmtN(agentFixedCost)}/mo`},
+          {label:'Option B: monthly savings',hint:`${aiCallReduction}% deflected × ${(users*callsPerUser/1e6).toFixed(1)}M × $${costPerCall} − $${fmtN(aiMaintenance)} = ~$${aiMonthlySavings}M net/mo`},
+          {label:'Option B payback period',hint:`$${fmtN(aiBuildCost)} ÷ monthly net savings ≈ ${aiPaybackMonths} months`},
+          {label:'Recommend + challenge one assumption',hint:`Is the ${aiCallReduction}% deflection rate validated? What happens if it's 15% instead?`},
+        ],
+        range:`Option B payback: ~${aiPaybackMonths} months | Agents are cheaper short-term, AI wins long-term on unit economics`,
+      };
+    },
+  ],
 };
 
 // ─────────────────────────────────────────────
@@ -527,7 +662,7 @@ let S = {
   recentQs:[],   // repeat prevention: tracks last 3 [cat:genIdx] strings
   catStats:{     // weakness tracking: per-category running score
     breakeven:{pts:0,n:0}, ev:{pts:0,n:0},
-    market:{pts:0,n:0}, weighted:{pts:0,n:0}, costs:{pts:0,n:0}
+    market:{pts:0,n:0}, weighted:{pts:0,n:0}, costs:{pts:0,n:0}, case:{pts:0,n:0}
   },
 };
 
