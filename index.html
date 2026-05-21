@@ -540,13 +540,13 @@ const BANK = {
 
       return {
         type:'Product Case', seconds:180,
-        text:`Capital One is deciding between two monetization models for a new in-app budgeting feature.\nCurrent mobile banking customers: ${fmtN(users)}\n\nOption A — Paid Only\n• $${paidPrice}/month subscription\n• Signup rate: ${paidConvPct}% of existing customers\n• Monthly churn: ${paidChurnPct}%\n\nOption B — Freemium\n• Free basic tools for everyone\n• Premium tier at $${premPrice}/month\n• Premium conversion: ${premConvPct}% of customers\n• Monthly churn (premium): ${premChurnPct}%\n• Engagement lift generates $${interchange}/month additional interchange per active user\n\nWhich option do you recommend? Use average lifetime (1 ÷ churn rate) for LTV. Challenge any assumptions in the framing before solving.`,
+        text:`Capital One is deciding between two monetization models for a new in-app budgeting feature.\n\nBackground\n• Current mobile banking customers: ${fmtN(users)} (use this — don't estimate)\n• Capital One earns $${interchange}/month in incremental interchange per active digital banking user\n\nOption A — Paid Only\n• $${paidPrice}/month subscription\n• Signup rate: ${paidConvPct}% of existing customers\n• Monthly churn: ${paidChurnPct}%\n\nOption B — Freemium\n• Free basic tools for all ${fmtN(users)} existing customers\n• Premium tier at $${premPrice}/month\n• Premium conversion: ${premConvPct}% of customers\n• Monthly churn (premium): ${premChurnPct}%\n\nWhich option generates more total lifetime value? Use average lifetime (1 ÷ churn rate). Before calculating, challenge any assumptions in how the Background figures apply to each option.`,
         formula:`Average Lifetime = 1 ÷ Monthly Churn Rate\nLTV = Monthly Revenue × Average Lifetime\nPortfolio Value = Subscribers × LTV`,
         calc:`A: ${fmtN(paidSubs)} × ${paidLife} mo × $${paidPrice} = $${fmtN(Math.round(paidLTV/1e6*10)/10)}M sub + $${fmtN(Math.round(paidInterchangeLTV/1e6*10)/10)}M interchange = $${fmtN(Math.round(totalALTV/1e6*10)/10)}M\nB: ${fmtN(premSubs)} × ${premLife} mo × $${premPrice} + ${fmtN(users)} × ${premLife} × $${interchange} = $${fmtN(Math.round(totalBLTV/1e6*10)/10)}M`,
         rubric:[
           `Challenged whether $${interchange} interchange applies to Option A subscribers too (it does)`,
           `Option A lifetime: 1 ÷ ${paidChurnPct/100} = ${paidLife} months | Option B: 1 ÷ ${premChurnPct/100} = ${premLife} months`,
-          'Identified interchange on full ${fmtN(users)}-user free base as the dominant variable',
+          `Identified interchange on full ${fmtN(users)}-user base as the dominant variable in Option B`,
           'Calculated portfolio LTV (subscribers × monthly revenue × lifetime) for both options',
           'Made a clear recommendation with at least one condition to validate',
         ],
